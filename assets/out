@@ -6,7 +6,7 @@
 # For the full copyright and license information, please view the LICENSE
 # file that was distributed with this source code.
 
-set -e
+set -ex
 set -o pipefail
 
 exec 3>&1 # make stdout available as fd 3 for the result
@@ -51,6 +51,10 @@ wait_until_ready_selector="$(jq -r '.params.wait_until_ready_selector // ""' < "
 if [[ "$wait_until_ready" -ne 0 ]]; then
   wait_until_pods_ready "$wait_until_ready" "$wait_until_ready_interval" "$wait_until_ready_selector"
 fi
+
+jsonnet --tla-code-file inv=/dev/stdin -m ${RENDER_DIR}  ${JSONNET_TEMPLATE} < "${payload}"
+echo kubectl apply -f ${RENDER_DIR}
+
 
 jq --arg kubectl "$kubectl_command" \
    --arg namespace "$(current_namespace)" \

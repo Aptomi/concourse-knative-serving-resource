@@ -1,8 +1,9 @@
 local app_name_secret(inv) = inv.params.app_name + "-secret";
 local service_account_name(inv) = inv.params.app_name + "-build-bot";
+local image_url(inv) = "docker.io/" + inv.params.dockerhub.username + "/app-from-source:latest";
 
 function(inv) {
-	"docker": {
+	"secret.json": {
 		apiVersion: "v1",
 		kind: "Secret",
 		metadata: {
@@ -13,12 +14,12 @@ function(inv) {
 		},
 		type: "kubernetes.io/basic-auth",
 		data: {
-  		username: inv.params.dockerhub.username,
-  		password: inv.params.dockerhub.password,
+  		username: std.base64(inv.params.dockerhub.username),
+  		password: std.base64(inv.params.dockerhub.password),
 		}
 	},
 
-	"service-secret": {
+	"service-account.json": {
 		apiVersion: "v1",
 		kind: "ServiceAccount",
 		metadata: {
@@ -31,7 +32,7 @@ function(inv) {
 		],
 	},
 
-	service: {
+	"service.json": {
   	"apiVersion": "serving.knative.dev/v1alpha1",
   	"kind": "Service",
   	"metadata": {
@@ -57,7 +58,7 @@ function(inv) {
   							"arguments": [
   								{
   									"name": "IMAGE",
-  									"value": "docker.io/" + inv.params.dockerhub.username + "/app-from-source:latest"
+  									"value": image_url(inv),
   								}
   							]
   						}
@@ -66,7 +67,7 @@ function(inv) {
   				"revisionTemplate": {
   					"spec": {
   						"container": {
-  							"image": "docker.io/" + inv.params.dockerhub.password + "/app-from-source:latest",
+  							"image": image_url(inv),
   							"imagePullPolicy": "Always",
   							"env": [
   								{
