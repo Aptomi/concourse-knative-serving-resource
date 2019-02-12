@@ -17,8 +17,8 @@ jobs:
 resource_types:
   - name: knative
     source:
-      repository: metacoma/concourse-resource-knative
-      tag: latest18
+      repository: aptomisvc/concourse-knative-resource
+      tag: latest
     type: docker-image
 
 resources:
