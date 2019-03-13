@@ -28,7 +28,18 @@ cd "$source_dir"
 payload=$(mktemp "$TMPDIR/kubernetes-resource-request.XXXXXX")
 cat > "$payload" <&0
 
-setup_kubectl "$payload"
+GOOGLE_APPLICATION_CREDENTIALS="/tmp/service_account.json"
+GOOGLE_ACCOUNT="$(jq -r '.source.gke.account' < "$payload")"
+GOOGLE_PROJECT_NAME="$(jq -r '.source.gke.project' < "$payload")"
+GOOGLE_ZONE="$(jq -r '.source.gke.zone' < "$payload")"
+GOOGLE_GKE_NAME="$(jq -r '.source.gke.name' < "$payload")"
+
+jq -r '.source.gke.service_account_json' < $payload > ${GOOGLE_APPLICATION_CREDENTIALS}
+gcloud auth activate-service-account ${GOOGLE_ACCOUNT} --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
+gcloud config set project ${GOOGLE_PROJECT_NAME}
+gcloud container clusters get-credentials --zone ${GOOGLE_ZONE} ${GOOGLE_GKE_NAME}
+
+#setup_kubectl "$payload"
 
 jsonnet --tla-code-file inv=/dev/stdin -m ${RENDER_DIR}  ${JSONNET_TEMPLATE} < "${payload}"
 kubectl apply -f ${RENDER_DIR}
