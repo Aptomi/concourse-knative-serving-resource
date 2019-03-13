@@ -49,52 +49,20 @@ version is the image's digest.
 ```
 jobs:
   - name: rest-api
-  ¦ plan:
-  ¦ ¦ - get: docker-image
-  ¦ ¦ ¦ trigger: true
-  ¦ ¦ - params:
-  ¦ ¦ ¦ ¦ kubectl: cluster-info
-  ¦ ¦ ¦ ¦ app_name: rest-api
-  ¦ ¦ ¦ ¦ image: aptomi/rest-api
-  ¦ ¦ ¦ ¦ namespace: default
-  ¦ ¦ ¦ put: knative-serving
+    plan:
+      - get: docker-image
+        trigger: true
+      - params:
+          kubectl: cluster-info
+          app_name: rest-api
+          image: aptomi/rest-api
+          namespace: default
+        put: knative-serving
 
 resource_types:
   - name: knative-serving
-  ¦ source:
-  ¦ ¦ repository: aptomisvc/concourse-knative-serving-resource
-  ¦ ¦ tag: latest
-  ¦ type: docker-image
-```
-
-
-
-```
-jobs:
-
-  - name: knative application
-    plan:
-      - params:
-          kubectl: get nodes
-          app_name: knative-sandboox
-          repo:
-            url: https://github.com/metacoma/knatve-sandboox.git
-            branch: master
-          dockerhub:
-            username: ((dockerhub_username))
-            password: ((dockerhub_password))
-        put: knative
-
-resource_types:
-  - name: knative
     source:
-      repository: aptomisvc/concourse-knative-resource
+      repository: aptomisvc/concourse-knative-serving-resource
       tag: latest
     type: docker-image
-
-resources:
-  - name: knative
-    source:
-      kubeconfig: ((kubeconfig))
-    type: knative
 ```
