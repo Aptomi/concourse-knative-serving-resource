@@ -46,7 +46,7 @@ version is the image's digest.
 
 ## Example
 
-```
+```yaml
 jobs:
   - name: rest-api
     plan:
