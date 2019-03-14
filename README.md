@@ -65,4 +65,15 @@ resource_types:
       repository: aptomisvc/concourse-knative-serving-resource
       tag: latest
     type: docker-image
+
+resources:
+  - name: knative-serving
+    source:
+      kubeconfig: ((kubeconfig))
+    type: knative-serving
+  - name: docker-image
+    source:
+      repository: aptomi/rest-api
+      tag: latest
+    type: docker-image
 ```
