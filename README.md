@@ -53,7 +53,6 @@ jobs:
       - get: docker-image
         trigger: true
       - params:
-          kubectl: cluster-info
           app_name: rest-api
           image: aptomi/rest-api
           namespace: default
